@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:int-ftp="http://www.springframework.org/schema/integration/ftp"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration 
+	    http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/file 
+		http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/ftp 
+		http://www.springframework.org/schema/integration/ftp/spring-integration-ftp.xsd">
+
+	<bean id="ftpClientFactory"
+		class="org.springframework.integration.ftp.session.DefaultFtpSessionFactory">
+		<property name="host" value="localhost" />
+		<property name="port" value="22" />
+		<property name="username" value="icf2030718" />
+		<property name="password" value="password" />
+		<property name="clientMode" value="0" />
+		<property name="fileType" value="2" />
+		<property name="bufferSize" value="100000" />
+	</bean>
+
+	<bean id="logService" class="com.helloftp.sample.service.LogService" />
+	
+	<int:service-activator ref="logService" method="log"
+		input-channel="fileChannel" />
+
+	<int:channel id="ftpChannel"></int:channel>
+
+	<int-ftp:inbound-channel-adapter id="inboundFtp"
+		channel="ftpChannel" session-factory="ftpClientFactory"
+		local-directory="/Users/icf2030718/Documents/newtrialsws/springftp/ftpinput"
+		remote-directory="/Users/icf2030718/Documents/newtrialsws/springftp/ftpinput">
+		<int:poller fixed-rate="1000" />
+	</int-ftp:inbound-channel-adapter>
+
+	<int-ftp:outbound-channel-adapter id="outboundFtp"
+		channel="ftpChannel" session-factory="ftpClientFactory"
+		remote-directory="/Users/icf2030718/Documents/newtrialsws/springftp/ftpoutput">
+	</int-ftp:outbound-channel-adapter>
+
+</beans>
+
+
+
